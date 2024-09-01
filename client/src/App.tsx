@@ -18,7 +18,26 @@ const App: React.FC = () => {
   const [status, setStatus] = useState<string>('');
 
   const handleCaptureAndUpload = async () => {
-    console.log('Capture and Upload Screenshots');
+    setStatus('Processing...');
+    for (const website of websites) {
+      try {
+        const response = await fetch('http://localhost:5000/api/screenshots', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: website.url, filename: `${website.id}_${website.name}` })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          setStatus(`Uploaded ${website.name} successfully. Google Drive File ID: ${result.fileId}`);
+        } else {
+          throw new Error(result.error || 'Failed to upload screenshot');
+        }
+      } catch (error: any) {
+        setStatus(`Error: ${error.message}`);
+      }
+    }
   };
 
   return (
