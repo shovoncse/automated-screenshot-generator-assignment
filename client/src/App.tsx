@@ -6,45 +6,55 @@ interface Website {
   url: string;
 }
 
-const websites: Website[] = [
-  { id: 1, name: 'iFunded', url: 'https://ifunded.de/en/' },
-  { id: 2, name: 'PropertyPartner', url: 'https://www.propertypartner.co' },
-  { id: 3, name: 'PropertyMoose', url: 'https://propertymoose.co.uk' },
-  { id: 4, name: 'Homegrown', url: 'https://www.homegrown.co.uk' },
-  { id: 5, name: 'RealtyMogul', url: 'https://www.realtymogul.com' },
-];
+interface Screenshot {
+  id: number;
+  name: string;
+  imagePath: string;
+}
 
 const App: React.FC = () => {
-  const [status, setStatus] = useState<string>('');
+  const [screenshots, setScreenshots] = useState<Screenshot[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const handleCaptureAndUpload = async () => {
-    setStatus('Processing...');
-    for (const website of websites) {
-      try {
-        const response = await fetch('http://localhost:5000/api/screenshots', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: website.url, filename: `${website.id}_${website.name}` })
-        });
+  const websites: Website[] = [
+    { id: 1, name: 'iFunded', url: 'https://ifunded.de/en/' },
+    { id: 2, name: 'PropertyPartner', url: 'https://www.propertypartner.co' },
+  ];
 
-        const result = await response.json();
+  const fetchScreenshots = () => {
+    setLoading(true);
 
-        if (response.ok) {
-          setStatus(`Uploaded ${website.name} successfully. Google Drive File ID: ${result.fileId}`);
-        } else {
-          throw new Error(result.error || 'Failed to upload screenshot');
-        }
-      } catch (error: any) {
-        setStatus(`Error: ${error.message}`);
-      }
-    }
+    fetch('http://localhost:3001/screenshots', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ websites }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      setScreenshots(data);
+    })
+    .catch(error => {
+      console.error('Error fetching screenshots:', error);
+    })
+    .finally(() => {
+      setLoading(false);
+      console.log('Screenshots fetched:', screenshots);
+    });
   };
 
   return (
-    <div className="App">
-      <h1>Screenshot Tool</h1>
-      <button onClick={handleCaptureAndUpload}>Capture and Upload Screenshots</button>
-      <p>{status}</p>
+    <div>
+      <h1>Website Screenshots</h1>
+      <button onClick={fetchScreenshots}>Fetch Screenshots</button>
+      {loading ? (
+        <p>Loading screenshots...</p>
+      ) : (
+        <div>
+          <p>Done ... {screenshots.length} screenshots fetched. see the console for more details.</p>
+        </div>
+      )}
     </div>
   );
 };
