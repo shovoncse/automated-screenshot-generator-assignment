@@ -12,8 +12,14 @@ interface Screenshot {
   imagePath: string;
 }
 
+interface ScreenshotResponse {
+  screenshots: Screenshot[];
+  folderLink: string;
+}
+
 const App: React.FC = () => {
   const [screenshots, setScreenshots] = useState<Screenshot[]>([]);
+  const [folderLink, setFolderLink] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,7 +30,7 @@ const App: React.FC = () => {
 
   const fetchScreenshots = async () => {
     setLoading(true);
-    setError(null); 
+    setError(null);
 
     try {
       const response = await fetch('http://localhost:3001/screenshots', {
@@ -39,8 +45,9 @@ const App: React.FC = () => {
         throw new Error('Network response was not ok');
       }
 
-      const data: Screenshot[] = await response.json();
-      setScreenshots(data);
+      const data: ScreenshotResponse = await response.json();
+      setScreenshots(data.screenshots);
+      setFolderLink(data.folderLink);
     } catch (error: any) {
       console.error('Error fetching screenshots:', error);
       setError('Failed to fetch screenshots. Please try again later.');
@@ -69,6 +76,13 @@ const App: React.FC = () => {
               />
             </div>
           ))}
+          {folderLink && (
+            <p>
+              <a href={folderLink} target="_blank" rel="noopener noreferrer">
+                View all screenshots in Google Drive
+              </a>
+            </p>
+          )}
         </div>
       )}
     </div>
