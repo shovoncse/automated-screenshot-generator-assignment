@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const cors = require('cors');
 const screenshotmachine = require('screenshotmachine');
@@ -21,7 +20,7 @@ const driveClientId = process.env.GOOGLE_DRIVE_CLIENT_ID || '';
 const driveClientSecret = process.env.GOOGLE_DRIVE_CLIENT_SECRET || '';
 const driveRedirectUri = process.env.GOOGLE_DRIVE_REDIRECT_URI || '';
 const driveRefreshToken = process.env.GOOGLE_DRIVE_REFRESH_TOKEN || '';
-const permanentParentFolderId = process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID || '';  // Add your permanent folder ID here
+const permanentParentFolderId = process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID || ''; 
 
 const googleDriveService = new GoogleDriveService(driveClientId, driveClientSecret, driveRedirectUri, driveRefreshToken);
 
@@ -43,7 +42,7 @@ app.post('/screenshots', async (req, res) => {
     return new Promise((resolve, reject) => {
       const options = {
         url: website.url,
-        dimension: '1366xfull',
+        dimension: '1920x1080',
         device: 'desktop',
         format: 'jpg',
         cacheLimit: '0',
@@ -69,7 +68,6 @@ app.post('/screenshots', async (req, res) => {
   try {
     const screenshots = await Promise.all(screenshotPromises);
 
-    // Create a new subfolder within the permanent parent folder
     const driveFolder = await googleDriveService.createFolder(`Screenshots_${timestamp}`, permanentParentFolderId);
 
     const uploadPromises = screenshots.map(async (screenshot) => {
@@ -83,10 +81,10 @@ app.post('/screenshots', async (req, res) => {
 
     const uploadedScreenshots = await Promise.all(uploadPromises);
 
-    // Clean up local files
+    
     fs.rmSync(folderPath, { recursive: true, force: true });
 
-    // Return the public link to the Drive subfolder
+    
     res.json({
       screenshots: uploadedScreenshots,
       folderLink: `https://drive.google.com/drive/folders/${driveFolder.data.id}?usp=sharing`

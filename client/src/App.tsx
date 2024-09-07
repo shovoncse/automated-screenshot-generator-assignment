@@ -26,6 +26,9 @@ const App: React.FC = () => {
   const websites: Website[] = [
     { id: 1, name: 'iFunded', url: 'https://ifunded.de/en/' },
     { id: 2, name: 'PropertyPartner', url: 'https://www.propertypartner.co' },
+    { id: 3, name: 'Property Moose', url: 'https://propertymoose.co.uk' },
+    { id: 4, name: 'Homegrown', url: 'https://www.homegrown.co.uk' },
+    { id: 5, name: 'Realty Mogul', url: 'https://www.realtymogul.com' },
   ];
 
   const fetchScreenshots = async () => {

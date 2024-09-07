@@ -30,7 +30,7 @@ class GoogleDriveService {
         resource,
         fields: 'id, name',
       });
-      return folder.data; // Returns the folder's ID and name
+      return folder.data;
     } catch (error) {
       console.error('Error creating folder:', error);
       throw error;
@@ -72,8 +72,7 @@ class GoogleDriveService {
         media,
         fields: 'id, name',
       });
-
-      // Make the file public
+      
       await this.driveClient.permissions.create({
         fileId: file.data.id,
         requestBody: {
